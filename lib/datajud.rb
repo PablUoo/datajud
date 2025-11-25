@@ -53,7 +53,7 @@ module Datajud
   end
 
   def self.processo(numero, tribunal: nil)
-    siglas_consulta = tribunal ? [tribunal.downcase] : TRIBUNAIS_SIGLAS
+    siglas_consulta = tribunal ? Array(tribunal).flatten.map { |t| t.to_s.downcase } : TRIBUNAIS_SIGLAS
     resultado = nil
 
     siglas_consulta.each do |sigla|
