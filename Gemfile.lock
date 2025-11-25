@@ -2,8 +2,9 @@ PATH
   remote: .
   specs:
     datajud (0.1.0)
-      json (>= 2.0)
-      net-http
+      json (~> 2.0)
+      net-http (~> 0.3)
+      nokogiri (~> 1.14)
 
 GEM
   remote: https://rubygems.org/
