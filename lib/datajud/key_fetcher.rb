@@ -1,11 +1,13 @@
 require 'open-uri'
 require 'nokogiri'
 require 'fileutils'
+require 'net/http'
+require 'uri'
 
 module Datajud
   module KeyFetcher
-    ACCESS_URL = "https://datajud-wiki.cnj.jus.br/api-publica/acesso"
-    CACHE_PATH = File.expand_path("~/.datajud_api_key")
+    ACCESS_URL = "https://datajud-wiki.cnj.jus.br/api-publica/acesso/"
+    CACHE_PATH = File.join(Dir.home, ".datajud_api_key")
 
     def self.fetch_api_key
       # Tenta carregar do cache
@@ -14,10 +16,9 @@ module Datajud
         return key unless key.empty?
       end
 
-      # Se não estiver em cache, busca online
-      html = URI.open(ACCESS_URL).read
+      html = Net::HTTP.get(URI.parse(ACCESS_URL))
       doc = Nokogiri::HTML.parse(html)
-      key = doc.text[/APIKey\s+([A-Za-z0-9+\/=]+)/, 1]
+      key = doc.text[/Authorization:\s*APIKey\s*([A-Za-z0-9+\/]+=+)/, 1]
       raise "API Key not found on Datajud-Wiki page!" unless key
 
       # Salva em cache
