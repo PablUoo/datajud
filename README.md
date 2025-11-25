@@ -16,7 +16,58 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-TODO: Write usage instructions here
+### Consultar processo sem passar tribunal
+
+```ruby
+require 'datajud'
+
+resultado = Datajud.processo("00008323520184013202")
+puts resultado
+```
+
+### Consultar processo passando 1 tribunal
+
+```ruby
+require 'datajud'
+
+resultado = Datajud.processo("00008323520184013202", tribunal: "trf1")
+puts resultado
+```
+
+### Consultar processo passando vários tribunais
+
+```ruby
+require 'datajud'
+
+resultado = Datajud.processo("00008323520184013202", tribunal: ["trf1", "tjmg"])
+puts resultado
+```
+
+### Listas de tribunais disponíveis
+
+Você pode acessar as listas de siglas dos tribunais diretamente pelas constantes do módulo:
+
+```ruby
+require 'datajud'
+
+# Todos os tribunais
+Datajud::TRIBUNAIS_SIGLAS
+
+# Apenas TJs
+Datajud::TJS_SIGLAS
+
+# Apenas TRFs
+Datajud::TRFS_SIGLAS
+
+# Apenas TRTs
+Datajud::TRTS_SIGLAS
+
+# Apenas TREs
+Datajud::TRES_SIGLAS
+
+# Apenas Superiores
+Datajud::SUPERIORES_SIGLAS
+```
 
 ## Development
 
