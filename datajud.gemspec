@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["pabloaurelio1163@gmail.com"]
 
   spec.summary = "Gem para consultar a API DataJUD por número de processo"
-  spec.description = "Gem Ruby que permite busca e extração detalhada de processos judiciais diretamente da API pública DataJUD do CNJ, preenchendo estruturas compatíveis com banco e DER de processos brasileiros."
+  spec.description = "Gem Ruby que permite busca e extração detalhada de processos judiciais diretamente da API pública DataJUD do CNJ, preenchendo estruturas de processos brasileiros."
   spec.homepage = "https://github.com/PablUoo/datajud"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
