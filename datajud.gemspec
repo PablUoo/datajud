@@ -21,9 +21,11 @@ Gem::Specification.new do |spec|
   spec.metadata["changelog_uri"] = "https://github.com/PablUoo/datajud/CHANGELOG.md"
 
   spec.files = Dir.chdir(__dir__) do
-    `git ls-files -z`.split("\x0").reject do |f|
+    files = `git ls-files -z`.split("\x0").reject do |f|
       (f == __FILE__) || f =~ /\.gem$/ || f.match(%r{\A(?:(?:test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
     end
+    files += Dir["lib/**/*.rb"]
+    files.uniq
   end
   spec.bindir = "bin"
   spec.executables = spec.files.grep(%r{\Abin/}) { |f| File.basename(f) }

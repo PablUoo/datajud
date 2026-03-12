@@ -1,8 +1,6 @@
 # Datajud
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/datajud`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+SDK simples para consumir a API pública do DataJud (CNJ) em Ruby.
 
 ## Installation
 
@@ -15,6 +13,91 @@ If bundler is not being used to manage dependencies, install the gem by executin
     $ gem install datajud
 
 ## Usage
+
+### Consultar processo com API orientada a objeto
+
+```ruby
+require 'datajud'
+
+processo = Datajud.find("00008323520184013202")
+
+# Com tribunal explícito
+processo = Datajud.find("00008323520184013202", tribunal: "trf1")
+
+processo.numero
+processo.classe
+processo.partes
+processo.movimentacoes
+
+# Tribunal como objeto
+processo.tribunal
+# => { nome: "TRF1", sigla: "TRF1", esfera: "Federal" }
+
+# Tabela HTML de endpoints (todos os tribunais conhecidos)
+Datajud.endpoints_table(Datajud::TRIBUNAIS_SIGLAS)
+```
+
+### Métodos de consulta disponíveis
+
+```ruby
+# API orientada a objeto
+processo = Datajud.find("00008323520184013202", tribunal: "trf1")
+
+# Retorno bruto (hash)
+resultado = Datajud.processo("00008323520184013202", tribunal: "trf1")
+
+# Consulta genérica com filtros (Elasticsearch)
+resultado = Datajud::ApiClient.buscar("trf1", match: { numeroProcesso: "00008323520184013202" })
+
+# Atalho para buscar processo (modo legado)
+resultado = Datajud::ApiClient.buscar_processo("00008323520184013202", "trf1")
+```
+
+> Dica: quando quiser ver todas as chaves retornadas pela API, prefira `Datajud.processo`.
+
+### Compatibilidade com ApiClient (modo legado)
+
+```ruby
+Datajud.configure do |config|
+    config.api_key = "SUA_API_KEY"
+end
+
+resultado = DataJud::ApiClient.buscar_processo("00008323520184013202", "trf1")
+puts resultado
+```
+
+### Auto-detectar tribunal pelo número CNJ
+
+Se o número estiver no formato CNJ, a gem tenta derivar o tribunal automaticamente
+para evitar varrer todas as bases.
+
+```ruby
+processo = Datajud.find("0000832-35.2018.8.26.0202")
+puts processo.tribunal
+```
+
+> A UF da comarca é derivada localmente pelo código IBGE do município quando disponível.
+
+### Configuração (API key, timeout e retries)
+
+```ruby
+Datajud.configure do |config|
+    config.api_key = "SUA_API_KEY"
+    config.open_timeout = 5
+    config.read_timeout = 15
+    config.retries = 2
+    config.retry_wait = 0.5
+    config.fallback_all_on_miss = true
+    config.lookup_ibge = true
+    config.ibge_base_url = "https://servicodados.ibge.gov.br/api/v1/localidades/municipios"
+end
+```
+
+Ou via variável de ambiente:
+
+```bash
+export DATAJUD_API_KEY="SUA_API_KEY"
+```
 
 ### Consultar processo sem passar tribunal
 
