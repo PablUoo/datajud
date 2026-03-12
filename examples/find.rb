@@ -11,11 +11,11 @@ begin
   processo = Datajud.find("0000832-35.2018.8.26.0202")
 
   if processo
-    puts "Tribunal: #{processo.tribunal}"
+    puts "Tribunal: #{processo.tribunal.nome}"
     puts "Número: #{processo.numero}"
-    puts "Classe: #{processo.classe}"
+    puts "Classe: #{processo.classe.nome}"
     puts "Partes: #{processo.partes.map(&:nome).join(', ')}"
-    puts "Movimentações: #{processo.movimentacoes.size}"
+    puts "Andamentos: #{processo.andamentos.size}"
   else
     puts "Processo não encontrado."
   end

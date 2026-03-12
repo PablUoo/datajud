@@ -19,19 +19,35 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ```ruby
 require 'datajud'
 
+# Busca processo (tribunal pode ser explícito ou inferido)
 processo = Datajud.find("00008323520184013202")
-
-# Com tribunal explícito
 processo = Datajud.find("00008323520184013202", tribunal: "trf1")
 
-processo.numero
-processo.classe
-processo.partes
-processo.movimentacoes
+# Acessa atributos principais
+puts processo.tribunal # Tribunal como objeto ou string
+puts processo.numero
+puts processo.vara
+puts processo.situacao
+puts processo.andamentos
+puts processo.documentos
+puts processo.audiencias
+puts processo.sistema
+puts processo.formato
+puts processo.data_ultima_atualizacao
+puts processo.data_ajuizamento
+puts processo.nivel_sigilo
+puts processo.id
+puts processo.timestamp
 
-# Tribunal como objeto
-processo.tribunal
-# => { nome: "TRF1", sigla: "TRF1", esfera: "Federal" }
+# Tribunal como objeto (se disponível)
+puts processo.tribunal.nome if processo.tribunal.respond_to?(:nome)
+puts processo.tribunal.sigla if processo.tribunal.respond_to?(:sigla)
+puts processo.tribunal.esfera if processo.tribunal.respond_to?(:esfera)
+
+# Exemplos de acesso orientado a objeto
+puts processo.vara.nome if processo.vara.respond_to?(:nome)
+puts processo.vara.comarca.nome if processo.vara&.comarca&.respond_to?(:nome)
+puts processo.assunto.map(&:nome) if processo.assunto
 
 # Tabela HTML de endpoints (todos os tribunais conhecidos)
 Datajud.endpoints_table(Datajud::TRIBUNAIS_SIGLAS)
@@ -42,6 +58,8 @@ Datajud.endpoints_table(Datajud::TRIBUNAIS_SIGLAS)
 ```ruby
 # API orientada a objeto
 processo = Datajud.find("00008323520184013202", tribunal: "trf1")
+# ou
+processo = Datajud.find("00008323520184013202", "trf1")
 
 # Retorno bruto (hash)
 resultado = Datajud.processo("00008323520184013202", tribunal: "trf1")
@@ -73,7 +91,7 @@ para evitar varrer todas as bases.
 
 ```ruby
 processo = Datajud.find("0000832-35.2018.8.26.0202")
-puts processo.tribunal
+puts processo.tribunal.nome
 ```
 
 > A UF da comarca é derivada localmente pelo código IBGE do município quando disponível.

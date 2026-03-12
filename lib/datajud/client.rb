@@ -3,7 +3,8 @@
 module Datajud
   class Client
     # Retorna uma instância de Datajud::Processo ou nil
-    def self.find(numero, tribunal: nil)
+    def self.find(numero, tribunal = nil, **kwargs)
+      tribunal = kwargs[:tribunal] if tribunal.nil? && kwargs.key?(:tribunal)
       raw = Datajud.processo(numero, tribunal: tribunal)
       return nil unless raw && raw[:processo] || raw && raw['processo']
 

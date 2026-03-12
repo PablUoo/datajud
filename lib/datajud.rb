@@ -320,12 +320,14 @@ module Datajud
   # A implementação mais rica (retornando objetos) está em Datajud::Client
 
   # Retorna um objeto Datajud::Processo ou nil
-  def self.find(numero, tribunal: nil)
+  def self.find(numero, tribunal = nil, **kwargs)
+    tribunal = kwargs[:tribunal] if tribunal.nil? && kwargs.key?(:tribunal)
     Datajud::Client.find(numero, tribunal: tribunal)
   end
 
   # Mantém método antigo para compatibilidade (retorna hash com dados brutos)
-  def self.processo(numero, tribunal: nil)
+  def self.processo(numero, tribunal = nil, **kwargs)
+    tribunal = kwargs[:tribunal] if tribunal.nil? && kwargs.key?(:tribunal)
     # A lógica original permanecida aqui para backward-compat
     siglas_consulta = if tribunal
                         Array(tribunal).flatten.map { |t| t.to_s.downcase }
@@ -355,11 +357,11 @@ module Datajud
         tribunal: tribunal_from(sigla, proc),
         processo: {
           numero: proc['numeroProcesso'],
-      vara: proc['orgaoJulgador'] ? {
-        nome: proc['orgaoJulgador']['nome'],
-        codigo: proc['orgaoJulgador']['codigo'],
-        comarca: comarca_from(proc['orgaoJulgador'], sigla)
-      } : nil,
+          vara: proc['orgaoJulgador'] ? {
+            nome: proc['orgaoJulgador']['nome'],
+            codigo: proc['orgaoJulgador']['codigo'],
+            comarca: comarca_from(proc['orgaoJulgador'], sigla)
+          } : nil,
           situacao: proc['situacao'],
           origem: proc['origem'],
           instancia: proc['grau'],
@@ -388,7 +390,14 @@ module Datajud
               status: aud['statusAudiencia'],
               observacao: aud['observacao']
             }
-          end
+          end,
+          sistema: proc['sistema'],
+          formato: proc['formato'],
+          dataHoraUltimaAtualizacao: proc['dataHoraUltimaAtualizacao'],
+          dataAjuizamento: proc['dataAjuizamento'],
+          nivelSigilo: proc['nivelSigilo'],
+          id: proc['id'],
+          timestamp: proc['@timestamp']
         }
       }
       break
@@ -469,7 +478,8 @@ module Datajud
     if comarca.is_a?(Hash)
       nome = comarca['nome'] || comarca['descricao'] || comarca['nomeComarca']
       uf = comarca['uf'] || comarca['siglaUf'] || comarca['estado']
-      return { nome: nome, uf: uf, tribunal: sigla.upcase }
+      hash = { nome: nome, uf: uf, tribunal: sigla.upcase }
+      return hash
     end
 
     nome = comarca || orgao_julgador['nome']
@@ -483,7 +493,11 @@ module Datajud
 
     return nil unless nome
 
-    { nome: nome, uf: uf, tribunal: sigla.upcase }
+    hash = { nome: nome, uf: uf, tribunal: sigla.upcase }
+    if orgao_julgador['codigoMunicipioIBGE']
+      hash[:codigoIbge] = orgao_julgador['codigoMunicipioIBGE']
+    end
+    hash
   end
 
   def self.ibge_uf_from(codigo_municipio)

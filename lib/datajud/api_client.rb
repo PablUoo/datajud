@@ -10,20 +10,19 @@ module Datajud
     # Consulta genérica: tribunal e filtros customizados
     def self.buscar(tribunal, filtros = {})
       endpoint = "/api_publica_#{tribunal.downcase}/_search"
-  url = URI("#{Datajud.configuration.base_endpoint}#{endpoint}")
-
+      url = URI("#{Datajud.configuration.base_endpoint}#{endpoint}")
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = (url.scheme == "https")
-  http.open_timeout = Datajud.configuration.open_timeout
-  http.read_timeout = Datajud.configuration.read_timeout
+      http.open_timeout = Datajud.configuration.open_timeout
+      http.read_timeout = Datajud.configuration.read_timeout
 
       request = Net::HTTP::Post.new(url)
-  request['Authorization'] = "APIKey #{Datajud.api_key}"
+      request['Authorization'] = "APIKey #{Datajud.api_key}"
       request['Content-Type'] = 'application/json'
       request.body = { query: filtros }.to_json
 
       begin
-  response = Datajud.request_with_retry(http, request)
+        response = Datajud.request_with_retry(http, request)
         if response.is_a?(Net::HTTPSuccess)
           JSON.parse(response.body)
         else
